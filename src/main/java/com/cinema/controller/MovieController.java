@@ -2,6 +2,7 @@ package com.cinema.controller;
 
 import com.cinema.model.Movie;
 import com.cinema.model.Reservation;
+import com.cinema.model.Seat;
 import com.cinema.service.MovieService;
 import com.cinema.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import java.util.List;
 
 @Controller
 public class MovieController {

@@ -1,7 +1,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
-    <title>Make a Reservation</title>
+    <title>Make a Reservation for ${movie.title}</title>
 </head>
 <body>
 <h1>Reserve Tickets for ${movie.title}</h1>
