@@ -3,7 +3,6 @@ package com.cinema.service;
 import java.util.List;
 
 import com.cinema.model.Movie;
-import com.cinema.model.Seat;
 import com.cinema.repository.MovieRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
