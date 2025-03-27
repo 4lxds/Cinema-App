@@ -21,20 +21,20 @@ public class MovieController {
     @Autowired
     private ReservationService reservationService;
 
-    //display movies
+    //1. display movies
     @GetMapping("/movies")
     public String listMovies(Model model) {
         model.addAttribute("movies", movieService.getAllMovies());
         return "movies";
     }
 
-    //add a movie
+    //ADDITIONAL add a movie
     @GetMapping("/movies/new")
     public String newMovieForm() {
         return "createMovie";
     }
 
-    //display movie details and reservation form
+    //2. display movie details and a link to a reservation form
     @GetMapping("/movie/{id}")
     public String movieDetails(@PathVariable Long id, Model model) {
         Movie movie = movieService.getMovieById(id);
@@ -42,18 +42,18 @@ public class MovieController {
         return "movieDetails";
     }
 
-    //add a movie
+    //ADDITIONAL add a movie
     @PostMapping("/movies/add")
     public String addMovie(
             @RequestParam("title") String title,
             @RequestParam("description") String description,
-            @RequestParam("ticketPrice") double price) {
-        Movie movie = new Movie(title, description, price);
+            @RequestParam("ticketPrice") double ticketPrice) {
+        Movie movie = new Movie(title, description, ticketPrice);
         movieService.saveMovie(movie);
         return "redirect:/movies";
     }
 
-    //reservation form
+    //3. reservation form
     @GetMapping("/reservation")
     public String showReservationForm(@RequestParam("movieId") Long movieId, Model model) {
         Movie movie = movieService.getMovieById(movieId);
@@ -61,7 +61,7 @@ public class MovieController {
         return "reservationForm";
     }
 
-    //process reservation form
+    //4. process reservation form
     @PostMapping("/reserve")
     public String reserveTickets(
             @RequestParam("movieId") Long movieId,
@@ -85,7 +85,7 @@ public class MovieController {
         return "reservationSummary";
     }
 
-    //confirmation and thank-you message
+    //5. confirmation and thank-you message
     @PostMapping("/confirmReservation")
     public String confirmReservation(@RequestParam("reservationId") Long reservationId, Model model) {
         Reservation reservation = reservationService.getReservationById(reservationId);

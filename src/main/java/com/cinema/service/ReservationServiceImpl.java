@@ -15,11 +15,11 @@ public class ReservationServiceImpl implements ReservationService {
 
     @Override
     public void saveReservation(Reservation reservation) {
-        reservationRepository.saveReservation(reservation);
+        reservationRepository.save(reservation);
     }
 
     @Override
     public Reservation getReservationById(Long id) {
-        return reservationRepository.getReservationById(id);
+        return reservationRepository.findById(id).orElse(null);
     }
 }

@@ -1,6 +1,6 @@
 package com.cinema.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 
 @Entity
 @Table(name = "movies")
@@ -14,9 +14,8 @@ public class Movie {
     @Column(length = 1000)
     private String description;
 
+    @Column(nullable = false,name = "ticketPrice")
     private double ticketPrice;
-
-    //getters and setters
 
     public Movie(String title, String description, double ticketPrice) {
         this.title = title;
