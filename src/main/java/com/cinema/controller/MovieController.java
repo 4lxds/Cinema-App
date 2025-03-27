@@ -73,8 +73,8 @@ public class MovieController {
     }
 
     //4. seat selection
-    @PostMapping("/reserve")
-    public String reserveTickets(
+    @PostMapping("/reviewReservation")
+    public String reviewReservation(
             @RequestParam("movieId") Long movieId,
             @RequestParam("numberOfTickets") int numberOfTickets,
             @RequestParam("selectedSeatIds") String selectedSeatIds,
@@ -85,7 +85,7 @@ public class MovieController {
                 .map(Long::parseLong)
                 .collect(Collectors.toList());
 
-        // if seat number == number of selected seats
+        // seat count == number of seats selected
         if (seatIdList.size() != numberOfTickets) {
             model.addAttribute("error", "Please select exactly " + numberOfTickets + " seats.");
             Movie movie = movieService.getMovieById(movieId);
@@ -96,43 +96,58 @@ public class MovieController {
         }
 
         Movie movie = movieService.getMovieById(movieId);
-        // create and save reservation
-        Reservation reservation = new Reservation();
-        reservation.setMovie(movie);
-        reservation.setNumberOfTickets(numberOfTickets);
         double totalPrice = numberOfTickets * movie.getTicketPrice();
-        reservation.setTotalPrice(totalPrice);
-        reservationService.saveReservation(reservation);
 
-        // add to reservation
-        for (Long seatId : seatIdList) {
-            Seat seat = seatRepository.findById(seatId).orElse(null);
-            if (seat.getReservation() != null) {
-                // if seat reserved
-                model.addAttribute("error", "Seat " + seat.getSeatLabel() + " is already reserved.");
-                Movie movieReload = movieService.getMovieById(movieId);
-                List<Seat> seats = seatRepository.findByMovieId(movieId);
-                model.addAttribute("movie", movieReload);
-                model.addAttribute("seats", seats);
-                return "reservationForm";
-            }
-            seat.setReservation(reservation);
-            seatRepository.save(seat);
-        }
-        String reservedSeats = seatIdList.stream()
+        // temporary reservation
+        Reservation tempReservation = new Reservation();
+        tempReservation.setMovie(movie);
+        tempReservation.setNumberOfTickets(numberOfTickets);
+        tempReservation.setTotalPrice(totalPrice);
+
+        String seatLabels = seatIdList.stream()
                 .map(id -> seatRepository.getReferenceById(id).getSeatLabel())
                 .collect(Collectors.joining(","));
-        reservation.setSeats(reservedSeats);
-        //save reservation
-        reservationService.saveReservation(reservation);
-        model.addAttribute("reservation", reservation);
-        return "reservationSummary";
+        tempReservation.setSeats(seatLabels);
+
+        model.addAttribute("tempReservation", tempReservation);
+        model.addAttribute("seatIdList", seatIdList);
+
+        return "reservationSummary"; // Show summary page
     }
 
     //5. confirmation and thank-you message
     @PostMapping("/confirmReservation")
-    public String confirmReservation(@RequestParam("reservationId") Long reservationId, Model model) {
-        Reservation reservation = reservationService.getReservationById(reservationId);
+    public String confirmReservation(
+            @RequestParam("movieId") Long movieId,
+            @RequestParam("numberOfTickets") int numberOfTickets,
+            @RequestParam("seatIds") List<Long> seatIds,
+            Model model
+    ) {
+        // recreate reservation
+        Movie movie = movieService.getMovieById(movieId);
+        double totalPrice = movie.getTicketPrice() * numberOfTickets;
+
+        Reservation reservation = new Reservation();
+        reservation.setMovie(movie);
+        reservation.setNumberOfTickets(numberOfTickets);
+        reservation.setTotalPrice(totalPrice);
+        String seatLabels = seatIds.stream()
+                .map(id -> seatRepository.getReferenceById(id).getSeatLabel())
+                .collect(Collectors.joining(","));
+        reservation.setSeats(seatLabels);
+
+        //save
+        reservationService.saveReservation(reservation);
+        for (Long seatId : seatIds) {
+            Seat seat = seatRepository.findById(seatId).orElse(null);
+            if (seat.getReservation() != null) {
+                model.addAttribute("error", "Seat " + seat.getSeatLabel() + " was just reserved!");
+                return "reservationSummary";
+            }
+            seat.setReservation(reservation);
+            seatRepository.save(seat);
+        }
+
         model.addAttribute("reservation", reservation);
         return "thankYou";
     }

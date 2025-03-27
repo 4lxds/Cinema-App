@@ -77,7 +77,7 @@
 <h1>Reserve Seats for ${movie.title}</h1>
 <p>Ticket Price: $${movie.ticketPrice}</p>
 
-<form action="${pageContext.request.contextPath}/reserve" method="post">
+<form action="${pageContext.request.contextPath}/reviewReservation" method="post">
     <input type="hidden" name="movieId" value="${movie.id}"/>
     <label for="numberOfTickets">Number of Tickets:</label>
     <input type="number" id="numberOfTickets" name="numberOfTickets" min="1" required/><br/><br/>
