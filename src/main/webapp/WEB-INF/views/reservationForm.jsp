@@ -104,6 +104,7 @@
         </c:forEach>
     </div>
 
+
     <input type="hidden" id="selectedSeatIds" name="selectedSeatIds" value=""/>
 
     <button type="submit">Reserve Selected Seats</button>

@@ -125,7 +125,6 @@ public class MovieController {
         reservation.setSeats(reservedSeats);
         //save reservation
         reservationService.saveReservation(reservation);
-
         model.addAttribute("reservation", reservation);
         return "reservationSummary";
     }
