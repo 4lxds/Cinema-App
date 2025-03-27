@@ -2,6 +2,8 @@ package com.cinema.controller;
 
 import com.cinema.model.Movie;
 import com.cinema.model.Reservation;
+import com.cinema.model.Seat;
+import com.cinema.repository.SeatRepository;
 import com.cinema.service.MovieService;
 import com.cinema.service.ReservationService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +14,10 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Controller
 public class MovieController {
 
@@ -20,6 +26,9 @@ public class MovieController {
 
     @Autowired
     private ReservationService reservationService;
+
+    @Autowired
+    private SeatRepository seatRepository;
 
     //1. display movies
     @GetMapping("/movies")
@@ -57,27 +66,63 @@ public class MovieController {
     @GetMapping("/reservation")
     public String showReservationForm(@RequestParam("movieId") Long movieId, Model model) {
         Movie movie = movieService.getMovieById(movieId);
+        List<Seat> seats = seatRepository.findByMovieId(movieId);
         model.addAttribute("movie", movie);
+        model.addAttribute("seats", seats);
         return "reservationForm";
     }
 
-    //4. process reservation form
+    //4. seat selection
     @PostMapping("/reserve")
     public String reserveTickets(
             @RequestParam("movieId") Long movieId,
             @RequestParam("numberOfTickets") int numberOfTickets,
-            @RequestParam("selectedSeats") String selectedSeats,
+            @RequestParam("selectedSeatIds") String selectedSeatIds,
             Model model
     ) {
-        Movie movie = movieService.getMovieById(movieId);
-        double totalPrice = movie.getTicketPrice() * numberOfTickets;
+        List<Long> seatIdList = Arrays.stream(selectedSeatIds.split(","))
+                .filter(s -> !s.trim().isEmpty())
+                .map(Long::parseLong)
+                .collect(Collectors.toList());
 
-        //actual reservation
+        // if seat number == number of selected seats
+        if (seatIdList.size() != numberOfTickets) {
+            model.addAttribute("error", "Please select exactly " + numberOfTickets + " seats.");
+            Movie movie = movieService.getMovieById(movieId);
+            List<Seat> seats = seatRepository.findByMovieId(movieId);
+            model.addAttribute("movie", movie);
+            model.addAttribute("seats", seats);
+            return "reservationForm";
+        }
+
+        Movie movie = movieService.getMovieById(movieId);
+        // create and save reservation
         Reservation reservation = new Reservation();
         reservation.setMovie(movie);
         reservation.setNumberOfTickets(numberOfTickets);
-        reservation.setSeats(selectedSeats);
+        double totalPrice = numberOfTickets * movie.getTicketPrice();
         reservation.setTotalPrice(totalPrice);
+        reservationService.saveReservation(reservation);
+
+        // add to reservation
+        for (Long seatId : seatIdList) {
+            Seat seat = seatRepository.findById(seatId).orElse(null);
+            if (seat.getReservation() != null) {
+                // if seat reserved
+                model.addAttribute("error", "Seat " + seat.getSeatLabel() + " is already reserved.");
+                Movie movieReload = movieService.getMovieById(movieId);
+                List<Seat> seats = seatRepository.findByMovieId(movieId);
+                model.addAttribute("movie", movieReload);
+                model.addAttribute("seats", seats);
+                return "reservationForm";
+            }
+            seat.setReservation(reservation);
+            seatRepository.save(seat);
+        }
+        String reservedSeats = seatIdList.stream()
+                .map(id -> seatRepository.getReferenceById(id).getSeatLabel())
+                .collect(Collectors.joining(","));
+        reservation.setSeats(reservedSeats);
         //save reservation
         reservationService.saveReservation(reservation);
 

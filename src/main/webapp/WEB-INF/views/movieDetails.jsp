@@ -6,7 +6,7 @@
 <body>
 <h1>${movie.title}</h1>
 <p>${movie.description}</p>
-<p>Price per ticket: $${movie.ticketPrice}</p>
+<p>Ticket Price: $${movie.ticketPrice}</p>
 
 <button onclick="location.href='${pageContext.request.contextPath}/reservation?movieId=${movie.id}'">Reserve Tickets</button>
 <br><br>
