@@ -1,7 +1,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
+    <meta charset="UTF-8">
     <title>Reserve Tickets for ${movie.title}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/darkly/bootstrap.min.css" rel="stylesheet">
     <style>
         .seat-grid {
             display: grid;
@@ -13,20 +15,21 @@
 
         .seat-button {
             padding: 10px;
-            cursor: pointer;
+            border: none;
+            border-radius: 4px;
         }
 
         .seat-available {
-            background-color: #cfc;
+            background-color: #28a745;
         }
 
         .seat-reserved {
-            background-color: #ccc;
+            background-color: #6c757d;
             cursor: not-allowed;
         }
 
         .seat-selected {
-            background-color: #4CAF50;
+            background-color: #198754;
             color: #fff;
         }
     </style>
@@ -73,43 +76,47 @@
         });
     </script>
 </head>
-<body>
-<h1>Reserve Seats for ${movie.title}</h1>
-<p>Ticket Price: $${movie.ticketPrice}</p>
-
-<form action="${pageContext.request.contextPath}/reviewReservation" method="post">
-    <input type="hidden" name="movieId" value="${movie.id}"/>
-    <label for="numberOfTickets">Number of Tickets:</label>
-    <input type="number" id="numberOfTickets" name="numberOfTickets" min="1" required/><br/><br/>
-
-    <div class="seat-grid">
-        <c:forEach var="seat" items="${seats}">
-            <c:choose>
-                <c:when test="${seat.reservation != null}">
-                    <button type="button"
-                            class="seat-button seat-reserved"
-                            disabled
-                            data-seat-id="${seat.id}">
-                            ${seat.seatLabel}
-                    </button>
-                </c:when>
-                <c:otherwise>
-                    <button type="button"
-                            class="seat-button seat-available"
-                            data-seat-id="${seat.id}">
-                            ${seat.seatLabel}
-                    </button>
-                </c:otherwise>
-            </c:choose>
-        </c:forEach>
-    </div>
-
-
-    <input type="hidden" id="selectedSeatIds" name="selectedSeatIds" value=""/>
-
-    <button type="submit">Reserve Selected Seats</button>
-</form>
-
-<a href="${pageContext.request.contextPath}/movies">Back to Movies List</a>
+<body class="bg-dark text-white">
+<div class="container mt-4">
+    <h1>Reserve Seats for ${movie.title}</h1>
+    <c:if test="${not empty base64Image}">
+        <img src="data:image/jpeg;base64,${base64Image}" alt="Movie Image" class="img-fluid mb-3"
+             style="max-width: 300px;"/>
+    </c:if>
+    <p class="lead">Ticket Price: $${movie.ticketPrice}</p>
+    <form action="${pageContext.request.contextPath}/reviewReservation" method="post">
+        <input type="hidden" name="movieId" value="${movie.id}"/>
+        <div class="mb-3">
+            <label for="numberOfTickets" class="form-label">Number of Tickets:</label>
+            <input type="number" id="numberOfTickets" name="numberOfTickets" min="1" class="form-control" required/>
+        </div>
+        <div class="seat-grid mb-3">
+            <c:forEach var="seat" items="${seats}">
+                <c:choose>
+                    <c:when test="${seat.reservation != null}">
+                        <button type="button"
+                                class="seat-button seat-reserved btn btn-secondary"
+                                disabled
+                                data-seat-id="${seat.id}">
+                                ${seat.seatLabel}
+                        </button>
+                    </c:when>
+                    <c:otherwise>
+                        <button type="button"
+                                class="seat-button seat-available btn btn-outline-success"
+                                data-seat-id="${seat.id}">
+                                ${seat.seatLabel}
+                        </button>
+                    </c:otherwise>
+                </c:choose>
+            </c:forEach>
+        </div>
+        <input type="hidden" id="selectedSeatIds" name="selectedSeatIds" value=""/>
+        <button type="submit" class="btn btn-primary">Reserve Selected Seats</button>
+    </form>
+    <br/>
+    <a href="${pageContext.request.contextPath}/movies" class="btn btn-secondary">Back to Movies List</a>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
