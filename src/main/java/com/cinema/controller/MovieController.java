@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.List;
@@ -99,6 +101,9 @@ public class MovieController {
             List<Seat> seats = seatRepository.findByMovieId(movieId);
             model.addAttribute("movie", movie);
             model.addAttribute("seats", seats);
+            if (movie.getImageData() != null && movie.getImageData().length > 0) {
+                model.addAttribute("base64Image", convertToBase64(movie.getImageData()));
+            }
             return "reservationForm";
         }
 
@@ -112,7 +117,10 @@ public class MovieController {
         Reservation tempReservation = new Reservation();
         tempReservation.setMovie(movie);
         tempReservation.setNumberOfTickets(numberOfTickets);
-        tempReservation.setTotalPrice(totalPrice);
+        BigDecimal price = BigDecimal.valueOf(movie.getTicketPrice());
+        BigDecimal total = price.multiply(BigDecimal.valueOf(numberOfTickets))
+                .setScale(2, RoundingMode.HALF_UP);
+        tempReservation.setTotalPrice(total);
 
         String seatLabels = seatIdList.stream()
                 .map(id -> seatRepository.getReferenceById(id).getSeatLabel())
@@ -140,7 +148,10 @@ public class MovieController {
         Reservation reservation = new Reservation();
         reservation.setMovie(movie);
         reservation.setNumberOfTickets(numberOfTickets);
-        reservation.setTotalPrice(totalPrice);
+        BigDecimal price = BigDecimal.valueOf(movie.getTicketPrice());
+        BigDecimal total = price.multiply(BigDecimal.valueOf(numberOfTickets))
+                .setScale(2, RoundingMode.HALF_UP);
+        reservation.setTotalPrice(total);
         String seatLabels = seatIds.stream()
                 .map(id -> seatRepository.getReferenceById(id).getSeatLabel())
                 .collect(Collectors.joining(","));
@@ -191,6 +202,7 @@ public class MovieController {
         return "redirect:/movies";
     }
 
+    //additional support for image conversion
     public String convertToBase64(byte[] imageData) {
         if (imageData == null || imageData.length == 0) {
             return null;

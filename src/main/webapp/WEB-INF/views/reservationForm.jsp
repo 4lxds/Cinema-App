@@ -14,41 +14,82 @@
         }
 
         .seat-button {
-            padding: 10px;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             border: none;
             border-radius: 4px;
+            text-align: center;
+            font-size: 0.85rem;
         }
 
         .seat-available {
             background-color: #28a745;
+            color: #000;
+            border: 1px solid #008000;
         }
 
         .seat-reserved {
             background-color: #6c757d;
+            color: #fff;
             cursor: not-allowed;
+            border: 1px solid #6f7278 !important;
         }
 
         .seat-selected {
-            background-color: #198754;
-            color: #fff;
+            background-color: #ffa500 !important;
+            color: #000 !important;
+            border: 1px solid #cc8400 !important;
+        }
+
+        .seat-selected:active {
+            background-color: #ffa500 !important;
+            border: 2px solid #000000 !important;
+        }
+
+
+        .dropdown-menu.custom-dropdown {
+            width: 40px !important;
+            min-width: 40px !important;
+            max-width: 40px !important;
+            padding: 0 !important;
+            background-color: #343a40 !important;
+            border: 1px solid #495057 !important;
+        }
+
+        .dropdown-item.custom-item {
+            font-size: 0.85rem !important;
+            padding: 0.25rem 0.4rem !important;
+            line-height: 1.2 !important;
+            color: #fff !important;
+            background-color: transparent;
         }
     </style>
     <script>
         window.addEventListener("DOMContentLoaded", function () {
-            const ticketInput = document.getElementById("numberOfTickets");
-            let maxSeats = parseInt(ticketInput.value) || 0;
+            let maxSeats = 0;
             const selectedSeats = new Set();
+            const hiddenTicketInput = document.getElementById("numberOfTickets");
+            const ticketDropdownButton = document.getElementById("ticketDropdown");
             const hiddenSeatInput = document.getElementById("selectedSeatIds");
 
-            ticketInput.addEventListener("change", function () {
-                maxSeats = parseInt(ticketInput.value) || 0;
-                if (selectedSeats.size > maxSeats) {
-                    selectedSeats.clear();
-                    document.querySelectorAll(".seat-button").forEach(function (btn) {
-                        btn.classList.remove("seat-selected");
-                    });
-                    updateHiddenInput();
-                }
+            document.querySelectorAll(".ticket-option").forEach(function (item) {
+                item.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    const value = parseInt(item.getAttribute("data-value"), 10);
+                    maxSeats = value;
+                    hiddenTicketInput.value = value;
+                    ticketDropdownButton.textContent = value;
+                    if (selectedSeats.size > maxSeats) {
+                        selectedSeats.clear();
+                        document.querySelectorAll(".seat-button").forEach(function (btn) {
+                            btn.classList.remove("seat-selected");
+                        });
+                        updateHiddenInput();
+                    }
+                });
             });
 
             function updateHiddenInput() {
@@ -57,7 +98,7 @@
 
             document.querySelectorAll(".seat-button").forEach(function (button) {
                 if (button.disabled) return;
-                button.addEventListener("click", function () {
+                button.addEventListener("mousedown", function () {
                     const seatId = button.getAttribute("data-seat-id");
                     if (selectedSeats.has(seatId)) {
                         selectedSeats.delete(seatId);
@@ -78,44 +119,79 @@
 </head>
 <body class="bg-dark text-white">
 <div class="container mt-4">
-    <h1>Reserve Seats for ${movie.title}</h1>
-    <c:if test="${not empty base64Image}">
-        <img src="data:image/jpeg;base64,${base64Image}" alt="Movie Image" class="img-fluid mb-3"
-             style="max-width: 300px;"/>
-    </c:if>
-    <p class="lead">Ticket Price: $${movie.ticketPrice}</p>
-    <form action="${pageContext.request.contextPath}/reviewReservation" method="post">
-        <input type="hidden" name="movieId" value="${movie.id}"/>
-        <div class="mb-3">
-            <label for="numberOfTickets" class="form-label">Number of Tickets:</label>
-            <input type="number" id="numberOfTickets" name="numberOfTickets" min="1" class="form-control" required/>
+    <div class="card bg-secondary text-white">
+        <div class="card-header text-center">
+            <h2 class="mb-0">Reserve Seats for ${movie.title}</h2>
         </div>
-        <div class="seat-grid mb-3">
-            <c:forEach var="seat" items="${seats}">
-                <c:choose>
-                    <c:when test="${seat.reservation != null}">
-                        <button type="button"
-                                class="seat-button seat-reserved btn btn-secondary"
-                                disabled
-                                data-seat-id="${seat.id}">
-                                ${seat.seatLabel}
-                        </button>
-                    </c:when>
-                    <c:otherwise>
-                        <button type="button"
-                                class="seat-button seat-available btn btn-outline-success"
-                                data-seat-id="${seat.id}">
-                                ${seat.seatLabel}
-                        </button>
-                    </c:otherwise>
-                </c:choose>
-            </c:forEach>
+        <div class="card-body">
+            <c:if test="${not empty error}">
+                <div class="alert alert-danger" role="alert">
+                        ${error}
+                </div>
+            </c:if>
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    <c:if test="${not empty base64Image}">
+                        <img src="data:image/jpeg;base64,${base64Image}" alt="Movie Image"
+                             class="img-fluid mb-3"
+                             style="max-width: 300px;"/>
+                    </c:if>
+                </div>
+                <div class="col-md-8 text-start">
+                    <p class="lead mb-2">Ticket Price: $${movie.ticketPrice}</p>
+                    <form action="${pageContext.request.contextPath}/reviewReservation" method="post">
+                        <input type="hidden" name="movieId" value="${movie.id}"/>
+                        <div class="mb-3 d-flex align-items-center">
+                            <label class="form-label mb-0 me-2" style="min-width: 120px;">Number of Tickets:</label>
+                            <div class="dropdown">
+                                <button class="btn btn-secondary btn-sm dropdown-toggle" type="button"
+                                        id="ticketDropdown" data-bs-toggle="dropdown" aria-expanded="false"
+                                        style="width: 40px;">
+                                    0
+                                </button>
+                                <ul class="dropdown-menu custom-dropdown" aria-labelledby="ticketDropdown">
+                                    <c:forEach var="i" begin="1" end="10">
+                                        <li>
+                                            <a class="dropdown-item custom-item ticket-option" href="#"
+                                               data-value="${i}">
+                                                    ${i}
+                                            </a>
+                                        </li>
+                                    </c:forEach>
+                                </ul>
+                            </div>
+                            <input type="hidden" id="numberOfTickets" name="numberOfTickets" value=""/>
+                        </div>
+                        <div class="seat-grid mb-3">
+                            <c:forEach var="seat" items="${seats}">
+                                <c:choose>
+                                    <c:when test="${seat.reservation != null}">
+                                        <button type="button" class="seat-button seat-reserved btn btn-secondary"
+                                                disabled data-seat-id="${seat.id}">
+                                                ${seat.seatLabel}
+                                        </button>
+                                    </c:when>
+                                    <c:otherwise>
+                                        <button type="button" class="seat-button seat-available btn btn-outline-success"
+                                                data-seat-id="${seat.id}">
+                                                ${seat.seatLabel}
+                                        </button>
+                                    </c:otherwise>
+                                </c:choose>
+                            </c:forEach>
+                        </div>
+                        <input type="hidden" id="selectedSeatIds" name="selectedSeatIds" value=""/>
+                        <button type="submit" class="btn btn-primary">Reserve Selected Seats</button>
+                    </form>
+                </div>
+            </div>
         </div>
-        <input type="hidden" id="selectedSeatIds" name="selectedSeatIds" value=""/>
-        <button type="submit" class="btn btn-primary">Reserve Selected Seats</button>
-    </form>
-    <br/>
-    <a href="${pageContext.request.contextPath}/movies" class="btn btn-secondary">Back to Movies List</a>
+        <div class="card-footer text-end">
+            <a href="${pageContext.request.contextPath}/movies" class="btn btn-secondary"
+               style="border: 1px solid #343a40;">
+                Back to Movies List</a>
+        </div>
+    </div>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>

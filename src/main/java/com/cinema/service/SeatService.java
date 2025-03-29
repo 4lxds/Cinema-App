@@ -1,6 +1,7 @@
 package com.cinema.service;
 
 import java.util.List;
+
 import com.cinema.model.Seat;
 
 public interface SeatService {

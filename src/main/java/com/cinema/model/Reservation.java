@@ -2,6 +2,8 @@ package com.cinema.model;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name = "reservations")
 public class Reservation {
@@ -17,12 +19,13 @@ public class Reservation {
 
     private String seats;
 
-    private double totalPrice;
+    @Column(precision = 10, scale = 2)
+    private BigDecimal totalPrice;
 
     public Reservation() {
     }
 
-    public Reservation(long id, Movie movie, int numberOfTickets, String seats, double totalPrice) {
+    public Reservation(long id, Movie movie, int numberOfTickets, String seats, BigDecimal totalPrice) {
         this.id = id;
         this.movie = movie;
         this.numberOfTickets = numberOfTickets;
@@ -62,11 +65,11 @@ public class Reservation {
         this.seats = seats;
     }
 
-    public double getTotalPrice() {
+    public BigDecimal getTotalPrice() {
         return totalPrice;
     }
 
-    public void setTotalPrice(double totalPrice) {
+    public void setTotalPrice(BigDecimal totalPrice) {
         this.totalPrice = totalPrice;
     }
 }
