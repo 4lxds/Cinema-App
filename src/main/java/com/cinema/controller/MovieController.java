@@ -96,11 +96,19 @@ public class MovieController {
 
         // seat count == number of seats selected
         if (seatIdList.size() != numberOfTickets) {
-            model.addAttribute("error", "Please select exactly " + numberOfTickets + " seats.");
+            String errorMsg;
+            if (numberOfTickets == 1) {
+                errorMsg = "Please select exactly 1 seat.";
+            } else {
+                errorMsg = "Please select exactly " + numberOfTickets + " seats.";
+            }
+            model.addAttribute("error", errorMsg);
+
             Movie movie = movieService.getMovieById(movieId);
             List<Seat> seats = seatRepository.findByMovieId(movieId);
             model.addAttribute("movie", movie);
             model.addAttribute("seats", seats);
+
             if (movie.getImageData() != null && movie.getImageData().length > 0) {
                 model.addAttribute("base64Image", convertToBase64(movie.getImageData()));
             }
