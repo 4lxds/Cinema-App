@@ -5,11 +5,11 @@
     <title>Movies</title>
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/darkly/bootstrap.min.css" rel="stylesheet">
     <style>
-        .card {
+        .card:not(.no-scale) {
             transition: transform 0.2s;
         }
 
-        .card:hover {
+        .card:not(.no-scale):hover {
             transform: scale(1.02);
         }
 
@@ -21,11 +21,12 @@
 </head>
 <body class="bg-dark text-white">
 <div class="container mt-4">
-    <div class="card bg-secondary text-white mb-4">
+    <div class="card bg-secondary text-white mb-4 no-scale">
         <div class="card-header text-center">
             <h1 class="mb-0">Movies</h1>
         </div>
     </div>
+
     <div class="row">
         <c:forEach var="movie" items="${movies}">
             <div class="col-md-3 mb-4">
@@ -44,11 +45,15 @@
             </div>
         </c:forEach>
     </div>
+
     <div class="d-flex justify-content-center">
-        <a href="${pageContext.request.contextPath}/movies/new" class="btn btn-primary">Create a New Movie</a>
+        <a href="${pageContext.request.contextPath}/movies/new" class="btn btn-primary">
+            Create a New Movie
+        </a>
     </div>
     <br>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
