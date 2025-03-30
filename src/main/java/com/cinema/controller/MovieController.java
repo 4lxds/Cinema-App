@@ -7,6 +7,7 @@ import com.cinema.model.Seat;
 import com.cinema.repository.SeatRepository;
 import com.cinema.service.MovieService;
 import com.cinema.service.ReservationService;
+import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -46,6 +47,7 @@ public class MovieController {
             dto.setTitle(movie.getTitle());
             dto.setDescription(movie.getDescription());
             dto.setTicketPrice(movie.getTicketPrice());
+            //image
             if (movie.getImageData() != null && movie.getImageData().length > 0) {
                 dto.setBase64Image(convertToBase64(movie.getImageData()));
             }
@@ -108,7 +110,7 @@ public class MovieController {
             List<Seat> seats = seatRepository.findByMovieId(movieId);
             model.addAttribute("movie", movie);
             model.addAttribute("seats", seats);
-
+            //image
             if (movie.getImageData() != null && movie.getImageData().length > 0) {
                 model.addAttribute("base64Image", convertToBase64(movie.getImageData()));
             }
@@ -117,6 +119,7 @@ public class MovieController {
 
         Movie movie = movieService.getMovieById(movieId);
         double totalPrice = numberOfTickets * movie.getTicketPrice();
+        //image
         if (movie.getImageData() != null && movie.getImageData().length > 0) {
             model.addAttribute("base64Image", convertToBase64(movie.getImageData()));
         }
@@ -141,12 +144,13 @@ public class MovieController {
         return "reservationSummary"; // Show summary page
     }
 
-    //5. confirmation and thank-you message
+    //5. confirmation
     @PostMapping("/confirmReservation")
     public String confirmReservation(
             @RequestParam("movieId") Long movieId,
             @RequestParam("numberOfTickets") int numberOfTickets,
             @RequestParam("seatIds") List<Long> seatIds,
+            HttpSession session,
             Model model
     ) {
         // recreate reservation
@@ -165,8 +169,8 @@ public class MovieController {
                 .collect(Collectors.joining(","));
         reservation.setSeats(seatLabels);
 
-        //save
         reservationService.saveReservation(reservation);
+        //attach seats
         for (Long seatId : seatIds) {
             Seat seat = seatRepository.findById(seatId).orElse(null);
             if (seat.getReservation() != null) {
@@ -176,8 +180,28 @@ public class MovieController {
             seat.setReservation(reservation);
             seatRepository.save(seat);
         }
-
+        //attach image
         model.addAttribute("reservation", reservation);
+        if (movie.getImageData() != null && movie.getImageData().length > 0) {
+            model.addAttribute("base64Image", convertToBase64(movie.getImageData()));
+        }
+        session.setAttribute("reservationId", reservation.getId());
+        return "redirect:/thankYou?resId=" + reservation.getId();
+    }
+
+    //6. thank-you message
+    @GetMapping("/thankYou")
+    public String thankYou(@RequestParam("resId") Long reservationId, HttpSession session, Model model) {
+        Long sessionReservationId = (Long) session.getAttribute("reservationId");
+        if (sessionReservationId == null || !sessionReservationId.equals(reservationId)) {
+            return "redirect:/movies";
+        }
+        Reservation reservation = reservationService.getReservationById(reservationId);
+        if (reservation == null) {
+            return "redirect:/movies";
+        }
+        model.addAttribute("reservation", reservation);
+        Movie movie = reservation.getMovie();
         if (movie.getImageData() != null && movie.getImageData().length > 0) {
             model.addAttribute("base64Image", convertToBase64(movie.getImageData()));
         }
