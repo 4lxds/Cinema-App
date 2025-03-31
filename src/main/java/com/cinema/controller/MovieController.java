@@ -1,14 +1,16 @@
 package com.cinema.controller;
 
-import com.cinema.model.Movie;
-import com.cinema.model.MovieDTO;
-import com.cinema.model.Reservation;
-import com.cinema.model.Seat;
+import com.cinema.model.*;
+import com.cinema.repository.ReservationRepository;
 import com.cinema.repository.SeatRepository;
+import com.cinema.repository.UserRepository;
 import com.cinema.service.MovieService;
 import com.cinema.service.ReservationService;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,9 +39,15 @@ public class MovieController {
     @Autowired
     private SeatRepository seatRepository;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private ReservationRepository reservationRepository;
+
     //1. display movies
     @GetMapping("/movies")
-    public String listMovies(Model model) {
+    public String listMovies(Model model, HttpServletRequest request) {
         List<Movie> movies = movieService.getAllMovies();
         List<MovieDTO> movieDTOs = movies.stream().map(movie -> {
             MovieDTO dto = new MovieDTO();
@@ -55,17 +63,24 @@ public class MovieController {
         }).collect(Collectors.toList());
 
         model.addAttribute("movies", movieDTOs);
+
+        String externalUrl = request.getRequestURL().toString();
+        model.addAttribute("externalUrl", externalUrl);
+
         return "movies";
     }
 
     //2. display movie details and a link to a reservation form
     @GetMapping("/movie/{id}")
-    public String movieDetails(@PathVariable Long id, Model model) {
+    public String movieDetails(@PathVariable Long id, Model model, HttpServletRequest request) {
         Movie movie = movieService.getMovieById(id);
         model.addAttribute("movie", movie);
 
         String base64Image = convertToBase64(movie.getImageData());
         model.addAttribute("base64Image", base64Image);
+
+        String externalUrl = request.getRequestURL().toString();
+        model.addAttribute("externalUrl", externalUrl);
 
         return "movieDetails";
     }
@@ -169,6 +184,11 @@ public class MovieController {
                 .collect(Collectors.joining(","));
         reservation.setSeats(seatLabels);
 
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName(); // username from authentication
+        User currentUser = userRepository.findByUsername(username);
+        reservation.setUser(currentUser);
+
         reservationService.saveReservation(reservation);
         //attach seats
         for (Long seatId : seatIds) {
@@ -208,13 +228,13 @@ public class MovieController {
         return "thankYou";
     }
 
-    //ADDITIONAL add a movie
+    //add a movie
     @GetMapping("/movies/new")
     public String newMovieForm() {
         return "createMovie";
     }
 
-    //ADDITIONAL add a movie
+    //add a movie
     @PostMapping("/movies/add")
     public String addMovie(
             @RequestParam("title") String title,
@@ -232,6 +252,16 @@ public class MovieController {
         }
         movieService.saveMovie(movie);
         return "redirect:/movies";
+    }
+
+    //user reservations
+    @GetMapping("/myReservations")
+    public String myReservations(Model model) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        String username = auth.getName();
+        List<Reservation> reservations = reservationRepository.findByUser_Username(username);
+        model.addAttribute("reservations", reservations);
+        return "myReservations";
     }
 
     //additional support for image conversion

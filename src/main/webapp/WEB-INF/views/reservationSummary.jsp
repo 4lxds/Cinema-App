@@ -1,3 +1,4 @@
+<%@ include file="header.jsp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
@@ -43,7 +44,7 @@
             </a>
             <a href="${pageContext.request.contextPath}/movies" class="btn btn-secondary"
                style="border: 1px solid #343a40;">
-                Back to Movie Selection
+                Back to Movies List
             </a>
         </div>
     </div>

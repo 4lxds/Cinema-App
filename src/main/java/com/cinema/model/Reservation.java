@@ -22,6 +22,10 @@ public class Reservation {
     @Column(precision = 10, scale = 2)
     private BigDecimal totalPrice;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     public Reservation() {
     }
 
@@ -31,6 +35,14 @@ public class Reservation {
         this.numberOfTickets = numberOfTickets;
         this.seats = seats;
         this.totalPrice = totalPrice;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public long getId() {

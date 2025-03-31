@@ -1,3 +1,4 @@
+<%@ include file="header.jsp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
@@ -31,7 +32,7 @@
         <div class="card-footer text-end">
             <a href="${pageContext.request.contextPath}/movies" class="btn btn-primary"
                style="border: 1px solid #343a40;">
-                Back to Movies</a>
+                Back to Movies List</a>
         </div>
     </div>
 </div>

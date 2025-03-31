@@ -1,3 +1,4 @@
+<%@ include file="header.jsp" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html>
 <head>
@@ -45,13 +46,15 @@
             </div>
         </c:forEach>
     </div>
-
-    <div class="d-flex justify-content-center">
-        <a href="${pageContext.request.contextPath}/movies/new" class="btn btn-primary">
-            Create a New Movie
-        </a>
-    </div>
-    <br>
+    <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
+    <sec:authorize access="hasRole('ADMIN')">
+        <div class="d-flex justify-content-center">
+            <a href="${pageContext.request.contextPath}/movies/new" class="btn btn-primary">
+                Create a New Movie
+            </a>
+        </div>
+        <br>
+    </sec:authorize>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
