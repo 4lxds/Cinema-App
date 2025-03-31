@@ -22,9 +22,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.util.Arrays;
-import java.util.Base64;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Controller
@@ -260,7 +258,25 @@ public class MovieController {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         String username = auth.getName();
         List<Reservation> reservations = reservationRepository.findByUser_Username(username);
-        model.addAttribute("reservations", reservations);
+
+        // Build a list of maps containing each reservation and a MovieDTO for its movie
+        List<Map<String, Object>> reservationData = reservations.stream().map(reservation -> {
+            Map<String, Object> map = new HashMap<>();
+            map.put("reservation", reservation);
+            Movie movie = reservation.getMovie();
+            MovieDTO movieDTO = new MovieDTO();
+            movieDTO.setId(movie.getId());
+            movieDTO.setTitle(movie.getTitle());
+            movieDTO.setDescription(movie.getDescription());
+            movieDTO.setTicketPrice(movie.getTicketPrice());
+            if (movie.getImageData() != null && movie.getImageData().length > 0) {
+                movieDTO.setBase64Image(convertToBase64(movie.getImageData()));
+            }
+            map.put("movieDTO", movieDTO);
+            return map;
+        }).collect(Collectors.toList());
+
+        model.addAttribute("reservationData", reservationData);
         return "myReservations";
     }
 
