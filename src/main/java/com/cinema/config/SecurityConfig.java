@@ -46,7 +46,7 @@ public class SecurityConfig {
     //error 403 without
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
-        return (web) -> web.ignoring().requestMatchers("/WEB-INF/**");
+        return (web) -> web.ignoring().requestMatchers("/WEB-INF/**", "/images/**");
     }
 
     @Bean
