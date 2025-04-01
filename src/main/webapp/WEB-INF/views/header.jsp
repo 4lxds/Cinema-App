@@ -40,7 +40,7 @@
                         <a class="nav-link" href="${pageContext.request.contextPath}/login?redirect=${externalUrl}">Login</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="${pageContext.request.contextPath}/register">Register</a>
+                        <a class="nav-link" href="${pageContext.request.contextPath}/register?redirect=${externalUrl}">Register</a>
                     </li>
                 </sec:authorize>
 

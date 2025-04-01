@@ -48,7 +48,7 @@
             <c:if test="${not empty error}">
                 <div class="alert alert-danger" role="alert">${error}</div>
             </c:if>
-            <form action="<c:url value='/register'/>" method="post">
+            <form action="<c:url value='/register?redirect=${redirect}'/>" method="post">
                 <div class="mb-3">
                     <label for="username" class="form-label">Username</label>
                     <input type="text" id="username" name="username" class="form-control" required/>
@@ -68,7 +68,7 @@
             </form>
             <p class="mt-3 text-center">
                 Already have an account?
-                <a href="${pageContext.request.contextPath}/login" class="text-info">Login here</a>
+                <a href="${pageContext.request.contextPath}/login?redirect=${redirect}" class="text-info">Login here</a>
             </p>
         </div>
         <div class="card-footer text-center">

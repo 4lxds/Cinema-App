@@ -31,13 +31,17 @@ public class RegistrationController {
     private AuthenticationManager authenticationManager;
 
     @GetMapping("/register")
-    public String showRegistrationForm(Model model) {
+    public String showRegistrationForm(Model model,
+                                       @RequestParam(value = "redirect", required = false) String redirect) {
         model.addAttribute("user", new User());
+        model.addAttribute("redirect", redirect);
         return "register";
     }
 
     @PostMapping("/register")
-    public String registerUser(@ModelAttribute("user") User user, Model model) {
+    public String registerUser(@ModelAttribute("user") User user,
+                               @RequestParam(value = "redirect", required = false) String redirect,
+                               Model model) {
         //if username is taken
         if (userRepository.findByUsername(user.getUsername()) != null) {
             model.addAttribute("error", "Username already exists!");
@@ -49,6 +53,10 @@ public class RegistrationController {
         user.setRoles("ROLE_USER");
         userRepository.save(user);
 
+        //after registration redirect with param
+        if (redirect != null && !redirect.isEmpty()) {
+            return "redirect:/login?redirect=" + redirect;
+        }
         return "redirect:/login";
     }
 
