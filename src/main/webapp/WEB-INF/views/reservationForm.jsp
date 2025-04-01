@@ -212,7 +212,8 @@
                 </div>
                 <div class="col-md-8 text-start">
                     <p class="lead mb-2">Ticket Price: $${movie.ticketPrice}</p>
-                    <form id="reservationForm" action="${pageContext.request.contextPath}/reviewReservation" method="post">
+                    <form id="reservationForm" action="${pageContext.request.contextPath}/reviewReservation"
+                          method="post">
                         <input type="hidden" name="movieId" value="${movie.id}"/>
                         <div class="mb-3 d-flex align-items-center">
                             <label class="form-label mb-0 me-2" style="min-width: 120px;">Number of Tickets:</label>

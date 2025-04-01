@@ -78,7 +78,8 @@
             </form>
             <p class="mt-3 text-center">
                 Don't have an account?
-                <a href="${pageContext.request.contextPath}/register?redirect=${param.redirect}" class="text-info">Register here</a>
+                <a href="${pageContext.request.contextPath}/register?redirect=${param.redirect}" class="text-info">Register
+                    here</a>
             </p>
         </div>
         <div class="card-footer text-center">

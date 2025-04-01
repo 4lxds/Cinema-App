@@ -14,6 +14,7 @@
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container-fluid">
         <a class="navbar-brand" href="${pageContext.request.contextPath}/movies" style="margin-left:10px;">
+            <!-- add a logo.png to the directory -->
             <img src="${pageContext.request.contextPath}/images/logo.png" alt="Cinema Reservation Logo"
                  style="height:30px;">
         </a>
