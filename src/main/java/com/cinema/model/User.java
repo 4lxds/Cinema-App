@@ -16,10 +16,8 @@ public class User {
     @Column(nullable = false)
     private String password;
 
-    // A comma-separated list of roles (e.g., "ROLE_USER,ROLE_ADMIN")
     private String roles;
 
-    // Getters and setters
     public Long getId() {
         return id;
     }

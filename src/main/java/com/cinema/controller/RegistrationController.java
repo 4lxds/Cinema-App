@@ -38,13 +38,13 @@ public class RegistrationController {
 
     @PostMapping("/register")
     public String registerUser(@ModelAttribute("user") User user, Model model) {
-        // Check if the username is already taken
+        //if username is taken
         if (userRepository.findByUsername(user.getUsername()) != null) {
             model.addAttribute("error", "Username already exists!");
             return "register";
         }
 
-        // Encode the password and assign a default role
+        //encode and default role
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         user.setRoles("ROLE_USER");
         userRepository.save(user);
@@ -67,25 +67,25 @@ public class RegistrationController {
             UsernamePasswordAuthenticationToken token =
                     new UsernamePasswordAuthenticationToken(username, password);
             Authentication auth = authenticationManager.authenticate(token);
-            // Set the authentication in the SecurityContext
+            //set authentication in SecurityContext
             SecurityContextHolder.getContext().setAuthentication(auth);
-            // Store the context in the session
+            //context in session
             HttpSession session = request.getSession(true);
             session.setAttribute(HttpSessionSecurityContextRepository.SPRING_SECURITY_CONTEXT_KEY,
                     SecurityContextHolder.getContext());
             Cookie userCookie = new Cookie("loggedInUser", username);
-            userCookie.setPath("/");          // Make it available to your whole application
-            userCookie.setMaxAge(86400);       // 1 day (86400 seconds)
-            userCookie.setHttpOnly(true);      // Prevent JavaScript access for security
+            userCookie.setPath("/");
+            userCookie.setMaxAge(86400); //1 day
+            userCookie.setHttpOnly(true);
             response.addCookie(userCookie);
 
             if (redirect != null && !redirect.isEmpty()) {
                 return "redirect:" + redirect;
             }
-            // Redirect to a secured page
+            //success redirect
             return "redirect:/movies";
         } catch (AuthenticationException ex) {
-            // Redirect back on failure
+            //fail redirect
             return "redirect:/login?error";
         }
     }

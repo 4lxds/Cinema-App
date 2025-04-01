@@ -24,7 +24,7 @@
 <div class="container mt-4">
     <div class="card bg-secondary text-white mb-4 no-scale">
         <div class="card-header text-center">
-            <h1 class="mb-0">Movies</h1>
+            <h1 class="mb-0">Movies List</h1>
         </div>
     </div>
 

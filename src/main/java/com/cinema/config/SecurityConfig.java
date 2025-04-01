@@ -34,7 +34,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin().disable()
-                .csrf().disable()
+                .csrf().disable() //add to every jsp (and then remove)
                 .logout(logout -> logout
                         .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                         .logoutSuccessHandler(customLogoutSuccessHandler)
@@ -43,6 +43,7 @@ public class SecurityConfig {
         return http.build();
     }
 
+    //error 403 without
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers("/WEB-INF/**");

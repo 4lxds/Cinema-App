@@ -29,12 +29,12 @@
                 <div class="col-md-8">
                     <p class="lead">${movie.description}</p>
                     <p><strong>Ticket Price:</strong> $${movie.ticketPrice}</p>
-                    <!-- If the user is authenticated, show the reserve button -->
+                    <!-- user authenticated -> reserve button -->
                     <sec:authorize access="isAuthenticated()">
                         <a href="${pageContext.request.contextPath}/reservation?movieId=${movie.id}"
                            class="btn btn-primary">Reserve Seats</a>
                     </sec:authorize>
-                    <!-- If not authenticated, show a warning message and login button -->
+                    <!-- if not -> warning message + login button -->
                     <sec:authorize access="!isAuthenticated()">
                         <div class="alert alert-warning mt-3" role="alert">
                             You must be logged in to reserve seats.

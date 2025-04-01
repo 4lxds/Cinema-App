@@ -10,7 +10,6 @@
        style="display:none;">Logout</a>
 </div>
 
-
 <c:set var="externalUrl" value="${externalUrl != null ? externalUrl : pageContext.request.requestURL.toString()}"/>
 
 <c:set var="internalPrefix" value="${pageContext.request.contextPath}/WEB-INF"/>
@@ -23,9 +22,11 @@
     <c:set var="externalUrl" value="${pageContext.request.contextPath}/movies"/>
 </c:if>
 
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
     <div class="container-fluid">
-        <a class="navbar-brand" href="${pageContext.request.contextPath}/movies">Cinema Reservation</a>
+        <a class="navbar-brand" href="${pageContext.request.contextPath}/movies"
+           style="margin-left:20px;">Cinema
+            Reservation</a>
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                 data-bs-target="#navbarContent" aria-controls="navbarContent"
                 aria-expanded="false" aria-label="Toggle navigation">
@@ -49,7 +50,7 @@
                            data-bs-toggle="dropdown" aria-expanded="false">
                             <sec:authentication property="principal.username"/>
                         </a>
-                        <ul class="dropdown-menu" aria-labelledby="userDropdown">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                             <li>
                                 <a class="dropdown-item" href="${pageContext.request.contextPath}/myReservations">
                                     My Reservations

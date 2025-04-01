@@ -47,13 +47,14 @@ public class MovieController {
     @GetMapping("/movies")
     public String listMovies(Model model, HttpServletRequest request) {
         List<Movie> movies = movieService.getAllMovies();
+        //all images
         List<MovieDTO> movieDTOs = movies.stream().map(movie -> {
             MovieDTO dto = new MovieDTO();
             dto.setId(movie.getId());
             dto.setTitle(movie.getTitle());
             dto.setDescription(movie.getDescription());
             dto.setTicketPrice(movie.getTicketPrice());
-            //image
+            //image conversion
             if (movie.getImageData() != null && movie.getImageData().length > 0) {
                 dto.setBase64Image(convertToBase64(movie.getImageData()));
             }
@@ -198,8 +199,8 @@ public class MovieController {
             seat.setReservation(reservation);
             seatRepository.save(seat);
         }
-        //attach image
         model.addAttribute("reservation", reservation);
+        //attach image
         if (movie.getImageData() != null && movie.getImageData().length > 0) {
             model.addAttribute("base64Image", convertToBase64(movie.getImageData()));
         }
@@ -259,7 +260,7 @@ public class MovieController {
         String username = auth.getName();
         List<Reservation> reservations = reservationRepository.findByUser_Username(username);
 
-        // Build a list of maps containing each reservation and a MovieDTO for its movie
+        //images
         List<Map<String, Object>> reservationData = reservations.stream().map(reservation -> {
             Map<String, Object> map = new HashMap<>();
             map.put("reservation", reservation);
@@ -280,7 +281,7 @@ public class MovieController {
         return "myReservations";
     }
 
-    //additional support for image conversion
+    //additional support image conversion
     public String convertToBase64(byte[] imageData) {
         if (imageData == null || imageData.length == 0) {
             return null;
