@@ -5,7 +5,6 @@
     <meta charset="UTF-8">
     <title>Reserve Tickets for ${movie.title}</title>
     <link href="https://cdn.jsdelivr.net/npm/bootswatch@5.3.0/dist/darkly/bootstrap.min.css" rel="stylesheet">
-
     <style>
         .seat-grid {
             display: grid;
@@ -84,6 +83,34 @@
             border-color: #4e555b !important;
             transform: scale(1.02);
             transition: transform 0.2s ease-in-out, background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+
+        /* Legend styling */
+        .legend {
+            margin-top: 5px;
+            text-align: center; /* Center the legend text and items */
+        }
+
+        .legend h5 {
+            margin-bottom: 5px;
+            font-size: 1rem;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+
+        .legend-color {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 8px;
+            border-radius: 4px;
+            border: 1px solid #000;
         }
     </style>
 
@@ -172,7 +199,6 @@
                     }
                 });
             });
-
             form.addEventListener("submit", function (e) {
                 clearTicketError();
                 const numberOfTickets = parseInt(hiddenTicketInput.value, 10) || 0;
@@ -198,18 +224,37 @@
             <h2 class="mb-0">Reserve Seats for ${movie.title}</h2>
         </div>
         <div class="card-body">
-            <c:if test="${not empty error}">
-                <div class="alert alert-danger" role="alert">
-                        ${error}
-                </div>
-            </c:if>
             <div class="row">
+                <!-- Left Column: Movie image and legend -->
                 <div class="col-md-4 text-center">
                     <c:if test="${not empty base64Image}">
                         <img src="data:image/jpeg;base64,${base64Image}" alt="Movie Image" class="img-fluid mb-3"
                              style="max-width: 300px;"/>
                     </c:if>
+                    <c:if test="${empty base64Image}">
+                        <span>No Image</span>
+                    </c:if>
+                    <!-- Legend centered below the image -->
+                    <div class="legend">
+                        <h5>Legend:</h5>
+                        <div class="legend-item">
+                            <span class="legend-color"
+                                  style="background-color: #28a745; border: 1px solid #008000;"></span>
+                            <span>Available Seat</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color"
+                                  style="background-color: #6c757d; border: 1px solid #6f7278;"></span>
+                            <span>Reserved Seat</span>
+                        </div>
+                        <div class="legend-item">
+                            <span class="legend-color"
+                                  style="background-color: #ffa500; border: 1px solid #cc8400;"></span>
+                            <span>Selected Seat</span>
+                        </div>
+                    </div>
                 </div>
+                <!-- Right Column: Reservation form -->
                 <div class="col-md-8 text-start">
                     <p class="lead mb-2">Ticket Price: $${movie.ticketPrice}</p>
                     <form id="reservationForm" action="${pageContext.request.contextPath}/reviewReservation"
@@ -239,11 +284,15 @@
                                 <c:choose>
                                     <c:when test="${seat.reservation != null}">
                                         <button type="button" class="seat-button seat-reserved btn btn-secondary"
-                                                disabled data-seat-id="${seat.id}">${seat.seatLabel}</button>
+                                                disabled data-seat-id="${seat.id}">
+                                                ${seat.seatLabel}
+                                        </button>
                                     </c:when>
                                     <c:otherwise>
                                         <button type="button" class="seat-button seat-available btn btn-outline-success"
-                                                data-seat-id="${seat.id}">${seat.seatLabel}</button>
+                                                data-seat-id="${seat.id}">
+                                                ${seat.seatLabel}
+                                        </button>
                                     </c:otherwise>
                                 </c:choose>
                             </c:forEach>
