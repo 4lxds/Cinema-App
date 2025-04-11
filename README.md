@@ -70,7 +70,7 @@ Here are the steps for booking a movie ticket:
 
 ---
 
-## Error Cases
+### Error Cases
 
 In case of errors, the application provides clear messages:
 
